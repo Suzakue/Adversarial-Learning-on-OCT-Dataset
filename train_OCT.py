@@ -186,21 +186,15 @@ def adjust_learning_rate_D(optimizer, i_iter):
     if len(optimizer.param_groups) > 1:
         optimizer.param_groups[1]['lr'] = lr * 10
 
-#
-# def one_hot(label):     # OCT的标签是255，191，128
-#     label = label.numpy()
-#     one_hot = np.zeros((label.shape[0], args.num_classes, label.shape[1], label.shape[2]), dtype=label.dtype)
-#     # OCT dataset -----------------------------------------------------------------
-#     if args.num_classes != 4:
-#         print('num_classes error!!!')
-#     one_hot[:, 0, ...] = (label == 0)
-#     one_hot[:, 1, ...] = (label == 255)
-#     one_hot[:, 2, ...] = (label == 191)
-#     one_hot[:, 3, ...] = (label == 128)
-#     # for i in range(args.num_classes):
-#     #     one_hot[:, i, ...] = (label == i)
-#     # handle ignore labels
-#     return torch.FloatTensor(one_hot)
+
+def one_hot(label):
+    label = label.numpy()
+    one_hot = np.zeros((label.shape[0], args.num_classes, label.shape[1], label.shape[2]), dtype=label.dtype)
+
+    for i in range(args.num_classes):
+        one_hot[:, i, ...] = (label == i)
+    # handle ignore labels
+    return torch.FloatTensor(one_hot)
 
 
 def make_D_label(label, ignore_mask):
@@ -473,7 +467,7 @@ def main():
                 _, batch = next(trainloader_gt_iter)
 
             _, labels_gt, _, _, _ = batch
-            D_gt_v = Variable(labels_gt).cuda(args.gpu)    # 每个类别一张label图，batch * class * h * w
+            D_gt_v = Variable(one_hot(labels_gt)).cuda(args.gpu)    # 每个类别一张label图，batch * class * h * w
             ignore_mask_gt = (labels_gt.numpy() == 255)
 
             D_out = interp(model_D(D_gt_v))     # ground_truth输入判别模型

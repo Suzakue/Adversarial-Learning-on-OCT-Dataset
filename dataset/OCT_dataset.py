@@ -23,8 +23,8 @@ class VOCDataSet(data.Dataset):
         self.crop_h, self.crop_w = crop_size
         self.scale = scale
         self.ignore_label = ignore_label
-        self.mean = torch.FloatTensor([0.1436941114418647, 0.1436719685843011, 0.1436498257267375])
-        self.std = torch.FloatTensor([0.0979543321185171, 0.09791953669338103, 0.09788472009243125])
+        self.mean = np.array([0.1436941114418647, 0.1436719685843011, 0.1436498257267375])
+        self.std = np.array([0.0979543321185171, 0.09791953669338103, 0.09788472009243125])
         self.is_mirror = mirror
         self.img_ids = [i_id.strip() for i_id in open(image_path)]
         self.label_ids = [i_id.strip() for i_id in open(label_path)]
@@ -76,8 +76,9 @@ class VOCDataSet(data.Dataset):
         if self.scale:
             image, label = self.generate_scale_label(image, label)
         image = np.asarray(image, np.float32)
-        # image -= self.mean
-        image.sub_(self.mean).div_(self.std)
+        image -= self.mean
+        image /= self.std
+        # image.sub_(self.mean).div_(self.std)
         img_h, img_w = label.shape
         pad_h = max(self.crop_h - img_h, 0)
         pad_w = max(self.crop_w - img_w, 0)
@@ -123,8 +124,8 @@ class VOCGTDataSet(data.Dataset):
         self.crop_h, self.crop_w = crop_size
         self.scale = scale
         self.ignore_label = ignore_label
-        self.mean = torch.FloatTensor([0.1436941114418647, 0.1436719685843011, 0.1436498257267375])
-        self.std = torch.FloatTensor([0.0979543321185171, 0.09791953669338103, 0.09788472009243125])
+        self.mean = np.array([0.1436941114418647, 0.1436719685843011, 0.1436498257267375])
+        self.std = np.array([0.0979543321185171, 0.09791953669338103, 0.09788472009243125])
         self.is_mirror = mirror
         self.img_ids = [i_id.strip() for i_id in open(image_path)]
         self.label_ids = [i_id.strip() for i_id in open(label_path)]
@@ -200,8 +201,9 @@ class VOCGTDataSet(data.Dataset):
             label = cv2.resize(label, self.crop_size, interpolation=cv2.INTER_NEAREST)
 
         image = np.asarray(image, np.float32)
-        image.sub_(self.mean).div_(self.std)
-
+        image -= self.mean
+        image /= self.std
+        # image.sub_(self.mean).div_(self.std)
         img_h, img_w = label.shape
         h_off = random.randint(0, img_h - self.crop_h)
         w_off = random.randint(0, img_w - self.crop_w)
