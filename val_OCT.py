@@ -32,7 +32,7 @@ IGNORE_LABEL = 255
 NUM_CLASSES = 4
 NUM_STEPS = 1449    # Number of images in the validation set.
 # RESTORE_FROM = 'http://vllab1.ucmerced.edu/~whung/adv-semi-seg/AdvSemiSegVOC0.125-8d75b3f1.pth'
-RESTORE_FROM = 'snapshots_OCT/VOC_epoch_19870_seg_loss_4.513260591920698e-06.pth'
+RESTORE_FROM = 'snapshots_OCT_0604/VOC_epoch_14386_seg_loss_2.286687958985567e-07.pth'
 PRETRAINED_MODEL = None
 SAVE_DIRECTORY = 'results_temp'
 
@@ -185,21 +185,21 @@ def show_all(gt, pred):
     plt.show()
 
 
-def transform_to_gray(gt):
-    gray_gt = np.zeros(gt.shape, dtype=gt.dtype)
-    for i in range(gt.shape[0]):
-        for j in range(gt.shape[1]):
-            if gt[i][j] == 255:
-                gray_gt[i][j] = 1
-            elif gt[i][j] == 191:
-                gray_gt[i][j] = 2
-            elif gt[i][j] == 128:
-                gray_gt[i][j] = 3
-            elif gt[i][j] == 0:
-                pass
-            else:
-                print('transform_to_gray error!!!', gt[i][j])
-    return gray_gt
+# def transform_to_gray(gt):
+#     gray_gt = np.zeros(gt.shape, dtype=gt.dtype)
+#     for i in range(gt.shape[0]):
+#         for j in range(gt.shape[1]):
+#             if gt[i][j] == 255:
+#                 gray_gt[i][j] = 1
+#             elif gt[i][j] == 191:
+#                 gray_gt[i][j] = 2
+#             elif gt[i][j] == 128:
+#                 gray_gt[i][j] = 3
+#             elif gt[i][j] == 0:
+#                 pass
+#             else:
+#                 print('transform_to_gray error!!!', gt[i][j])
+#     return gray_gt
 
 
 def main():
@@ -244,7 +244,7 @@ def main():
         output = model(Variable(image, volatile=True).cuda(gpu0))
         output = interp(output).cpu().data[0].numpy()
 
-        output = output[:,:size[0],:size[1]]
+        output = output[:, :size[0], :size[1]]
         gt = np.asarray(label[0].numpy()[:size[0], :size[1]], dtype=np.int)
 
         output = output.transpose(1, 2, 0)
@@ -258,7 +258,7 @@ def main():
         color_file.save(filename)
 
         # show_all(gt, output)
-        gt = transform_to_gray(gt)
+        # gt = transform_to_gray(gt)
         data_list.append([gt.flatten(), output.flatten()])
 
     filename = os.path.join(args.save_dir, 'result.txt')
