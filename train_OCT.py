@@ -55,7 +55,7 @@ RANDOM_SEED = 1234
 RESTORE_FROM = 'http://vllab1.ucmerced.edu/~whung/adv-semi-seg/resnet101COCO-41f33a49.pth'
 SAVE_NUM_IMAGES = 2
 SAVE_PRED_EVERY = 5000
-SNAPSHOT_DIR = './snapshots_OCT_0604/'
+SNAPSHOT_DIR = './snapshots_OCT_0606/'
 WEIGHT_DECAY = 0.0005
 
 LEARNING_RATE_D = 1e-4
@@ -163,8 +163,16 @@ def loss_calc(pred, label, gpu):
     """
     # out shape batch_size x channels x h x w -> batch_size x channels x h x w
     # label shape h x w x 1 x batch_size  -> batch_size x 1 x h x w
-    label = Variable(label.long()).cuda(args.gpu)
-    criterion = CrossEntropy2d().cuda(args.gpu)
+    label = Variable(label.long()).cuda(gpu)
+    criterion = CrossEntropy2d().cuda(gpu)
+
+    return criterion(pred, label, gpu)
+
+
+def loss_NLL(pred, label, gpu):
+    label = Variable(label.long()).cuda(gpu)
+    weight_1 = torch.Tensor([1, 5, 10, 20])
+    criterion = nn.NLLLoss(weight=weight_1, ignore_index=255).cuda(gpu)
 
     return criterion(pred, label)
 
@@ -421,6 +429,7 @@ def main():
             pred = interp(model(images))    # interp上采样
 
             loss_seg = loss_calc(pred, labels, args.gpu)    # 语义分割的cross entropy loss
+            # loss_seg_NLL = loss_NLL(pred, labels, args.gpu)     # 语义分割的NLLLoss
 
             D_out = interp(model_D(F.softmax(pred)))    # 得到判别模型输出的判别图
 
@@ -436,6 +445,7 @@ def main():
             # loss_adv_pred_value += loss_adv_pred.data.cpu().numpy()[0]/args.iter_size
 
             loss_seg_value += loss_seg.data.cpu().numpy()/args.iter_size
+            # loss_seg_value += loss_seg_NLL.data.cpu().numpy()/args.iter_size
             loss_adv_pred_value += loss_adv_pred.data.cpu().numpy()/args.iter_size
 
             # train D
