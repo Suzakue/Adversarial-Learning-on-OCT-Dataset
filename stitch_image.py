@@ -4,7 +4,7 @@ import os
 
 temp_dir = 'results_temp/'
 list_path = '/home/hejiawen/pytorch/ZRRP/AI-OCT/data/cutted_data_path/val_images.txt'
-save_dir = 'results_OCT_0605/'
+save_dir = 'results_OCT_0607/'
 name_list = list()
 
 with open(list_path, 'r') as f:

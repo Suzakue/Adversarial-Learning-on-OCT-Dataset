@@ -32,7 +32,7 @@ IGNORE_LABEL = 255
 NUM_CLASSES = 4
 NUM_STEPS = 1449    # Number of images in the validation set.
 # RESTORE_FROM = 'http://vllab1.ucmerced.edu/~whung/adv-semi-seg/AdvSemiSegVOC0.125-8d75b3f1.pth'
-RESTORE_FROM = 'snapshots_OCT_0604/VOC_epoch_14386_seg_loss_2.286687958985567e-07.pth'
+RESTORE_FROM = 'snapshots_OCT_0606/VOC_epoch_10169_seg_loss_3.4401500670355745e-06.pth'
 PRETRAINED_MODEL = None
 SAVE_DIRECTORY = 'results_temp'
 
